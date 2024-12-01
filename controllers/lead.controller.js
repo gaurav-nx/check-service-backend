@@ -4,6 +4,7 @@ const countrySchema = require('../model/country.modal');
 const stateSchema = require('../model/state.modal');
 const notificationSchema = require('../model/notification.modal');
 const nodemailer = require('nodemailer');
+const { default: mongoose } = require('mongoose');
 
 const AddLead = async (req, res) => {
     try {
@@ -583,7 +584,7 @@ const UpdateLeadAssignprocess = async (req, res) => {
         const data = { $push: { Filing_Process: req.body.Filing_Process } };
         console.log('>>>>>>>>>>>>>>>>> 584 >>>>>>>>>>>>', companyIds);
         console.log('>>>>>>>>>>>>>>>>> 585 >>>>>>>>>>>>', req.body.Filing_Process);
-        
+
         const updatedCompanyDetails = await leadschema.findByIdAndUpdate(
             companyIds,
             data,
@@ -591,7 +592,7 @@ const UpdateLeadAssignprocess = async (req, res) => {
         );
 
         console.log('>>>>>>>>>>>>593>>>>>>>>>>>', updatedCompanyDetails);
-        
+
         if (!updatedCompanyDetails) {
             console.error(`Lead with ID  not found after updating status`);
         }
@@ -726,6 +727,19 @@ const getFillingManagerLead = async (req, res) => {
         const skip = (parseInt(page) - 1) * parseInt(perPage);
 
         const data = await leadschema.find(filter)
+
+            // const data = await leadschema.find({
+            //     ...filter,
+            //     // Filing_ManagerID: id,
+            //     status: {$ne: 4},
+            //     visaapproved: { $ne: "Visa approved" },
+            //     $expr: {
+            //         $and: [
+            //             { $ne: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "Visa approved"] },
+            //             { $ne: [{ $arrayElemAt: ["$Filing_Process.visarefusal", -1] }, "Visa refusal"] }
+            //         ]
+            //     }
+            // })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(perPage));
@@ -805,7 +819,7 @@ const updatefilingteam = async (req, res) => {
                     status = "Files Submitted";
                     break;
                 }
-                if (val.caseInitiated == 'true' && val.fileIntiated == 'true' && val.docsReceived == 'true' && val.sopprepration == 'true' && val.sopletters == 'true' && val.confirmrecieved == 'true' && val.filesent == 'true' && val.filesusubmitted== 'Files Submitted')  {
+                if (val.caseInitiated == 'true' && val.fileIntiated == 'true' && val.docsReceived == 'true' && val.sopprepration == 'true' && val.sopletters == 'true' && val.confirmrecieved == 'true' && val.filesent == 'true' && val.filesusubmitted == 'Files Submitted') {
                     status = "Visa approved";
                     break;
                 }
@@ -2907,7 +2921,7 @@ const getLeadFillingManager = async (req, res) => {
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.sopletters", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.confirmrecieved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.filesent", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.visarefusal", -1] }, "Visa refusal"] }
                         ]
                     }
@@ -3206,17 +3220,17 @@ const getLeadFillingCaseCount = async (req, res) => {
 
 const otherNotesLeadUpdate = async(req,res) => {
     try {
-        
-let otherNotes = req.body.otherNotes
-let id = req.body.id
-// console.log("-------------------",req.body);
+
+        let otherNotes = req.body.otherNotes
+        let id = req.body.id
+        // console.log("-------------------",req.body);
 
 
-let data = await leadschema.findByIdAndUpdate(id, {other_note: otherNotes })
- data = await leadschema.findById(id)
-// console.log('data: ', data);
+        let data = await leadschema.findByIdAndUpdate(id, {other_note: otherNotes })
+        data = await leadschema.findById(id)
+        // console.log('data: ', data);
 
-return res.status(200).json({error: false, message: data.other_note})
+        return res.status(200).json({error: false, message: data.other_note})
 
     } catch (error) {
         return res.status(400).json({error: true, message: "somthing went to wrong"+error})
@@ -3225,24 +3239,24 @@ return res.status(200).json({error: false, message: data.other_note})
 
 const otherNoeDataGet = async(req,res) => {
     try {
-    let data = req.query.data
-    // let page=req.query.page
-    // let perPage=req.query.perPage
+        let data = req.query.data
+        // let page=req.query.page
+        // let perPage=req.query.perPage
 
-    console.log('data------------: ', data);
+        console.log('data------------: ', data);
 
-    let filter = {};
-    // const skip = (parseInt(page) - 1) * parseInt(perPage);
- 
+        let filter = {};
+        // const skip = (parseInt(page) - 1) * parseInt(perPage);
+
         filter.$or = Object.keys(leadschema.schema.paths)
             .filter(field => leadschema.schema.paths[field].instance === 'String')
             .map(field => ({ [field]: { $regex: data, $options: 'i' } }));
-    
-    const datas = await leadschema.find({ ...filter})
-    .sort({ createdAt: -1 })
-    // .skip(skip)
-    // .limit(parseInt(perPage));
-    return res.status(200).json({error: false, message: datas})
+
+        const datas = await leadschema.find({ ...filter})
+            .sort({ createdAt: -1 })
+        // .skip(skip)
+        // .limit(parseInt(perPage));
+        return res.status(200).json({error: false, message: datas})
 
     } catch (error) {
         return res.status(400).json({error: true, message: "somthing went to wrong"})
@@ -3690,16 +3704,16 @@ const getLeadFillingCase = async (req, res) => {
                 const skip = (parseInt(page) - 1) * parseInt(perPage);
 
                 const data = await leadschema.find({
-                    ...filter, status: 4, $expr: {
+                    ...filter, $expr: {
                         $and: [
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.caseInitiated", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.fileIntiated", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.docsReceived", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.sopprepration", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.sopletters", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.confirmrecieved", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.filesent", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.caseInitiated", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.fileIntiated", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.docsReceived", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.sopprepration", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.sopletters", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.confirmrecieved", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.filesent", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.filessubmitted", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.visarefusal", -1] }, "Visa refusal"] }
                         ]
                     }
@@ -4300,7 +4314,7 @@ const getAnalyticsCount = async (req, res) => {
 const getAnalyticsLeads = async (req, res) => {
     try {
         const { page, perPage, searchQuery, startDate, endDate, gender, education, country, Proficiency_Test, Lead_Type, Lead_Source } = req.query;
-console.log(req.query);
+        console.log(req.query);
 
         if (!gender && !education && !country && !Proficiency_Test && !Lead_Type && !Lead_Source) {
             const filter = {};
@@ -4506,16 +4520,23 @@ const UpdateStatus = async (req, res) => {
             return res.status(404).json({ error: true, message: 'Lead not found' });
         }
 
-        if (lead.status !== '4') {
-            return res.status(400).json({ error: true, message: 'Lead status is not 4 (Refusal), cannot update' });
-        }
+        // if (lead.status !== '4') {
+        //     return res.status(400).json({ error: true, message: 'Lead status is not 4 (Refusal), cannot update' });
+        // }
 
         lead.status = '4';
         console.log('Updating status to:', lead.status);
 
-        lead = await lead.save();
+        await leadschema.findByIdAndUpdate(
+            id,  // Replace with your document ID
+            {
+                $set: {
+                    Filing_Process: [],  // Empties the Filing_Process array
+                   // status: newStatus    // Updates the status field
+                }
+            }
+        );
         console.log('Updated Lead:', lead);
-
         return res.status(200).json({ error: false, message: 'Status updated successfully', lead });
 
     } catch (error) {
@@ -4524,7 +4545,43 @@ const UpdateStatus = async (req, res) => {
     }
 };
 
+const LeadsTransfer = async (req, res) => {
+    try {
+        const { Old_teamID, Filing_TeamID, Filing_TeamName } = req.body;
+
+        const filterConditions = {
+            $expr: { $ne: [{ $arrayElemAt: ["$status_convert", -1] }, "Close"]},
+        };
+
+        const query = {
+            $or: [
+                { Filing_ManagerID: new mongoose.Types.ObjectId(Old_teamID) },
+                { Filing_TeamID: new mongoose.Types.ObjectId(Old_teamID) },
+                { Lead_AssignID: new mongoose.Types.ObjectId(Old_teamID) },
+                { pre_sales_id: new mongoose.Types.ObjectId(Old_teamID) },
+            ],
+            ...filterConditions
+        };
+
+        const updatedCampaignDetails = await leadschema.updateMany(
+            query, // Filter: find all records with this campaign_id
+            {
+                $set: {
+                    Filing_ManagerID: new mongoose.Types.ObjectId(Filing_TeamID),
+                    Filing_TeamName: Filing_TeamName,
+                    Filing_TeamID: new mongoose.Types.ObjectId(Filing_TeamID),
+                    Lead_AssignID: new mongoose.Types.ObjectId(Filing_TeamID),
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        return res.status(200).json({ error: false, message: 'Status updated successfully', updatedCampaignDetails });
+    } catch (error) {
+        console.error('Error while updating status:', error);
+        return res.status(500).json({ error: true, message: 'Internal Server Error', data: null });
+    }
+}
 
 
-
-module.exports = { otherNoeDataGet,otherNotesLeadUpdate,GetAllFillinfTeam, GetAllFillinfManager, AddLead, GetAllLead, allLeadCount, preSalesFreshCount, listAllLeads, UpdateLead, leadUpdateById, DeleteLead, GetByIdLead, GetAllSales, UpdateLeadAssign, fillingManagerLeadAssign, GetAllLeadSAleRole, getFillingManagerLead, getFillingTeamLead, UpdateLeadAssignprocess, updatefilingteam, updateTermCondition, leadUnclose, deletePaymentById, leaderBoard, getLeadstatusCount, getLeadStatus, getLeadTodayCount, getLeadFillingManagerCount, getLeadFillingManager, getLeadFillingCaseCount, getLeadFillingCase, getRevenueBoardCount, getAdminRevenueBoardCount, getRevenueBoardLead, getAnalyticsCount, getAnalyticsLeads, getCaseTodayCount, getCaseTodayLead, UpdateStatus };
+module.exports = { otherNoeDataGet, otherNotesLeadUpdate, GetAllFillinfTeam, GetAllFillinfManager, AddLead, GetAllLead, allLeadCount, preSalesFreshCount, listAllLeads, UpdateLead, leadUpdateById, DeleteLead, GetByIdLead, GetAllSales, UpdateLeadAssign, fillingManagerLeadAssign, GetAllLeadSAleRole, getFillingManagerLead, getFillingTeamLead, UpdateLeadAssignprocess, updatefilingteam, updateTermCondition, leadUnclose, deletePaymentById, leaderBoard, getLeadstatusCount, getLeadStatus, getLeadTodayCount, getLeadFillingManagerCount, getLeadFillingManager, getLeadFillingCaseCount, getLeadFillingCase, getRevenueBoardCount, getAdminRevenueBoardCount, getRevenueBoardLead, getAnalyticsCount, getAnalyticsLeads, getCaseTodayCount, getCaseTodayLead, UpdateStatus, LeadsTransfer };

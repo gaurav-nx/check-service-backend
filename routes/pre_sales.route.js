@@ -1,7 +1,7 @@
 var express = require('express')
 const presales = express.Router();
 const { singleUpload } = require('../middleware/multer')
-const { otherNoeDataGet,otherNotesLeadUpdate, AddLead, GetAllLead, allLeadCount, preSalesFreshCount, listAllLeads, UpdateLead, leadUpdateById, GetAllFillinfManager, GetAllFillinfTeam, GetAllLeadSAleRole, getFillingManagerLead, getFillingTeamLead, DeleteLead, GetByIdLead, GetAllSales, UpdateLeadAssign, fillingManagerLeadAssign, UpdateLeadAssignprocess, updatefilingteam, updateTermCondition, leadUnclose, deletePaymentById, leaderBoard, getLeadstatusCount, getLeadStatus, getLeadTodayCount, getLeadFillingManagerCount, getLeadFillingManager, getLeadFillingCaseCount, getLeadFillingCase, getRevenueBoardCount, getAdminRevenueBoardCount, getRevenueBoardLead, getAnalyticsCount, getAnalyticsLeads, getCaseTodayCount, getCaseTodayLead, UpdateStatus } = require('../controllers/lead.controller')
+const { otherNoeDataGet,otherNotesLeadUpdate, AddLead, GetAllLead, allLeadCount, preSalesFreshCount, listAllLeads, UpdateLead, leadUpdateById, GetAllFillinfManager, GetAllFillinfTeam, GetAllLeadSAleRole, getFillingManagerLead, getFillingTeamLead, DeleteLead, GetByIdLead, GetAllSales, UpdateLeadAssign, fillingManagerLeadAssign, UpdateLeadAssignprocess, updatefilingteam, updateTermCondition, leadUnclose, deletePaymentById, leaderBoard, getLeadstatusCount, getLeadStatus, getLeadTodayCount, getLeadFillingManagerCount, getLeadFillingManager, getLeadFillingCaseCount, getLeadFillingCase, getRevenueBoardCount, getAdminRevenueBoardCount, getRevenueBoardLead, getAnalyticsCount, getAnalyticsLeads, getCaseTodayCount, getCaseTodayLead, UpdateStatus, LeadsTransfer } = require('../controllers/lead.controller')
 
 presales.post('/AddLead', singleUpload, AddLead);
 presales.get('/GetAllLead', GetAllLead);
@@ -44,5 +44,6 @@ presales.post('/getcase-notesUpdate', otherNotesLeadUpdate);
 presales.get('/getcasenote', otherNoeDataGet);
 
 presales.put('/visarefusal-update-status', UpdateStatus);
+presales.put('/transfer-leads', LeadsTransfer);
 
 module.exports = presales;
