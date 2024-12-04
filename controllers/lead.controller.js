@@ -4098,7 +4098,7 @@ const getLeadFillingCase = async (req, res) => {
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.sopletters", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.confirmrecieved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.filesent", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.visarefusal", -1] }, "Visa refusal"] }
                         ]
                     }
@@ -4117,7 +4117,7 @@ const getLeadFillingCase = async (req, res) => {
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.sopletters", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.confirmrecieved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.filesent", -1] }, "true"] },
-                            { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
+                            // { $eq: [{ $arrayElemAt: ["$Filing_Process.visaapproved", -1] }, "true"] },
                             { $eq: [{ $arrayElemAt: ["$Filing_Process.visarefusal", -1] }, "Visa refusal"] }
                         ]
                     }
